@@ -1,0 +1,13 @@
+<!doctype html>
+<title>SmartRemote</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block body %}{% endblock %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li style="color:blue">{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}

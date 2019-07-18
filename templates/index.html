@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block body %}
+    <div>
+      <p><h3>Current schedule</h3></p>
+      {% if schedule|length %}
+      <table  border="1">
+        <TR>
+           <TD class="c1">Action</TD>
+           <TD class="c2">Every day at</TD>
+           <TD class="c3">Last executed</TD>
+           <TD class="c4">Delete from schedule</TD>
+        </TR>
+      {% for item in schedule %}
+        <TR>
+           <TD class="c1">{{ item.action }}</TD>
+           <TD class="c2">{{ item.time|strftime }}</TD>
+           <TD class="c3">{{ item.lastExec }}</TD>
+           <TD class="c4"><a href="/removeSchedule/{{ item.action }}/{{ item.time|strftime }}">Remove</a></TD>
+        </TR>
+      {% endfor %}
+      </table>
+      {% else %}
+      You haven't scheduled any actions.
+      {% endif %}
+    </div>
+    <div>
+      <p><h3>Recorded codes</h3></p>
+      {% if codes.keys()|length %}
+      <table border="1">
+        <TR>
+           <TD class="c1">Name</TD>
+           <TD class="c2">Delete</TD>
+           <TD class="c3">Test</TD>
+        </TR>
+      {% for item in codes.keys() %}
+        <TR>
+           <TD class="c1">{{ item }}</TD>
+           <TD class="c2"><a href="/deleteCode/{{ item }}">Delete</a></TD>
+           <TD class="c3"><a href="/playCode/{{ item }}">Replay now</a></TD>
+        </TR>
+      {% endfor %}
+      </table>
+      {% else %}
+      You haven't recorded any codes.
+      {% endif %}
+      <div>
+        <p><h4>Record new code</h4></p>
+        <p>After clicking record, wait for the led to turn on and then play the code to the device. Then the page will refresh.</p>
+      <form onsubmit="return doSomething();" action="/recordCode" method="post">
+        <label for="name">Choose a name for the new code:</label>
+        <input type="text" id="name" name="name" required><br>
+        <input type="submit" text="Record new code">
+      </form>
+      </div>
+    <div>
+    </div>
+      <p><h3>Schedule new action</h3></p>
+      {% if codes.keys()|length %}
+      <form action="/scheduleAction" method="post">
+        <label for="time">Choose a time for the action (in UTC!!!):</label>
+        <input type="time" id="time" name="time" required><br>
+        <label for="action">Choose an action to be done:</label>
+        <select id="action" name="action">
+          {% for name in codes.keys() %}
+            <option value="{{name}}">{{name}}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <input type="submit">
+      </form>
+      {% else %}
+      You haven't recorded any codes, please record one before scheduling an action.
+      {% endif %}
+    </div>
+{% endblock %}
