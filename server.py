@@ -6,6 +6,7 @@ import os
 import threading
 import pickle
 from functools import wraps
+from flask_basicauth import BasicAuth
 
 def persistent(f):
     @wraps(f)
@@ -18,6 +19,10 @@ def persistent(f):
 
 app = Flask(__name__)
 app.secret_key = b'_5%yangr4Q8z\n\xec]/'
+app.config['BASIC_AUTH_USERNAME'] = 'jack'
+app.config['BASIC_AUTH_PASSWORD'] = 'telecomando'
+
+basic_auth = BasicAuth(app)
 
 RECORD = 0
 PLAY = 1
@@ -53,12 +58,14 @@ def loadState():
     lock.release()
 
 @app.route('/')
+@basic_auth.required
 @persistent
 def main():
     loadState()
     return render_template('index.html', codes=codes, schedule=schedule)
 
 @app.route('/scheduleAction', methods = ['POST'])
+@basic_auth.required
 @persistent
 def scheduleAction():
     time_str = request.form.get("time", "")
@@ -77,6 +84,7 @@ def scheduleAction():
     return redirect(url_for('main'))
 
 @app.route('/removeSchedule/<name>/<time>')
+@basic_auth.required
 @persistent
 def removeFromSchedule(name, time):
     time = datetime.strptime(time, '%H:%M')
@@ -102,6 +110,7 @@ def getNextAction():
     return None
 
 @app.route('/getAction')
+@basic_auth.required
 @persistent
 def getAction():
     global schedule
@@ -118,6 +127,7 @@ def getAction():
     return ""
 
 @app.route('/postCode/<name>', methods = ['POST'])
+@basic_auth.required
 @persistent
 def postCode(name):
     global codes
@@ -129,6 +139,7 @@ def postCode(name):
     return ""
 
 @app.route('/recordCode', methods=['POST'])
+@basic_auth.required
 @persistent
 def record():
     global immediate_requests
@@ -145,6 +156,7 @@ def record():
     return redirect(url_for('main'))
 
 @app.route('/deleteCode/<name>')
+@basic_auth.required
 @persistent
 def deleteCode(name):
     global codes
@@ -157,6 +169,7 @@ def deleteCode(name):
     return redirect(url_for('main'))
 
 @app.route('/playCode/<name>')
+@basic_auth.required
 @persistent
 def play(name):
     immediate_requests.append([PLAY,name])
